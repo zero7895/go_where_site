@@ -17,6 +17,7 @@ type Place = {
   duration: string;
   supplies: string[];
   mrtFriendly: boolean;
+  mapUrl?: string;
 };
 
 type PlaceSeed = [string, string, "室內" | "戶外", number, number, boolean, string, string];
@@ -184,6 +185,7 @@ const attractionPlaces: Place[] = placeSeeds.map(([name, area, type, budget, tra
 
 const restaurantPlaces: Place[] = restaurantSeeds.map(([name, area, type, budget, travel, chair, emoji, feature], index) => ({
   name, area, category: "餐廳", type, budget, travel, chair, emoji, tone: tones[(index + 2) % tones.length],
+  mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${area}`)}`,
   mrtFriendly: mrtFriendlyPlaceNames.has(name),
   tags: ["親子用餐", mrtFriendlyPlaceNames.has(name) ? "捷運方便" : "兒童椅"],
   reason: `${feature}。`,
@@ -322,6 +324,7 @@ export default function Home() {
             <h3>{result.name}</h3>
             <p className="why">{result.reason}以{startingPoint}出發，{transport}估計約 {getTravelMinutes(result, transport)} 分鐘。</p>
             <div className="stats"><div><small>單程{transport}</small><b>{getTravelMinutes(result, transport)} 分鐘</b></div><div><small>建議停留</small><b>{result.duration}</b></div><div><small>預估花費</small><b>{result.budget === 0 ? "免費" : `約 $${result.budget}`}</b></div></div>
+            {result.mapUrl && <a className="map-link" href={result.mapUrl} target="_blank" rel="noopener noreferrer" aria-label={`在 Google Maps 查看 ${result.name}`}>⌖ 在 Google Maps 查看</a>}
           </div>
         </article>
 
