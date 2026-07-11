@@ -15,12 +15,13 @@ type Place = {
   reason: string;
   duration: string;
   supplies: string[];
+  mrtFriendly: boolean;
 };
 
 type PlaceSeed = [string, string, "室內" | "戶外", number, number, boolean, string, string];
 
 const placeSeeds: PlaceSeed[] = [
-  // 新北市：板橋出發的近程選擇
+  // 新北市：新埔捷運站出發的近程選擇
   ["板橋 435 藝文特區", "板橋", "戶外", 200, 15, false, "🎨", "草地、展館與親子藝術空間一次滿足"],
   ["新北市立圖書館總館", "板橋", "室內", 0, 15, true, "📚", "親子閱讀區安靜舒適，雨天也好安排"],
   ["臺灣玩具博物館", "板橋", "室內", 300, 15, false, "🧸", "收藏大量童玩，能讓寶寶看色彩與大人懷舊"],
@@ -119,10 +120,23 @@ const placeSeeds: PlaceSeed[] = [
 ];
 
 const tones = ["peach", "sage", "blue", "green", "yellow", "aqua"];
+const startingPoint = "新埔捷運站";
+const mrtFriendlyPlaceNames = new Set([
+  "板橋放送所", "林本源園邸", "新北市民廣場", "板橋萬坪都會公園", "新北市藝文中心",
+  "四號公園", "國立臺灣圖書館", "碧潭風景區", "新北大都會公園", "熊猴森樂園",
+  "臺北市立動物園", "國立臺灣博物館本館", "國立臺灣博物館鐵道部園區", "國立臺灣博物館南門館",
+  "國立歷史博物館", "臺北植物園", "中正紀念堂園區", "華山 1914 文化創意產業園區",
+  "松山文創園區", "大安森林公園", "榮星花園公園", "北投溫泉博物館",
+  "臺北市立圖書館北投分館", "臺北市立美術館", "臺北探索館", "臺北市客家文化主題公園",
+  "自來水博物館園區", "台北偶戲館", "郵政博物館", "士林官邸公園", "二二八和平公園",
+  "大湖公園", "南興公園", "Xpark", "桃園市兒童美術館", "華興池生態埤塘公園",
+  "橫山書法藝術館", "桃園機場第二航廈觀景台", "巧虎夢想樂園",
+]);
 const places: Place[] = placeSeeds.map(([name, area, type, budget, travel, chair, emoji, feature], index) => ({
   name, area, type, budget, travel, chair, emoji, tone: tones[index % tones.length],
-  tags: [feature.split("，")[0].slice(0, 6), type === "室內" ? "雨天可選" : "戶外散步"],
-  reason: `${feature}。以板橋出發估計約 ${travel} 分鐘，適合依寶寶當天精神彈性調整停留時間。`,
+  mrtFriendly: mrtFriendlyPlaceNames.has(name),
+  tags: [feature.split("，")[0].slice(0, 6), mrtFriendlyPlaceNames.has(name) ? "捷運方便" : type === "室內" ? "雨天可選" : "戶外散步"],
+  reason: `${feature}。適合依寶寶當天精神彈性調整停留時間。`,
   duration: travel >= 55 ? "3–5 小時" : type === "室內" ? "1.5–3 小時" : "2–3 小時",
   supplies: type === "室內" ? ["輕便推車", "薄外套", "寶寶水杯", "安撫小物"] : ["遮陽帽", "防蚊用品", "水與點心", "替換衣物"],
 }));
@@ -134,8 +148,15 @@ const budgetOptions = [
   { label: "都可以", value: 3000 },
 ];
 
+function getTravelMinutes(place: Place, transport: "開車" | "捷運") {
+  return transport === "捷運"
+    ? Math.min(75, place.travel + (place.area === "板橋" ? 5 : 10))
+    : place.travel;
+}
+
 export default function Home() {
   const [kind, setKind] = useState<"都可以" | "室內" | "戶外">("都可以");
+  const [transport, setTransport] = useState<"開車" | "捷運">("開車");
   const [budget, setBudget] = useState(1000);
   const [travel, setTravel] = useState(45);
   const [chair, setChair] = useState(false);
@@ -144,15 +165,20 @@ export default function Home() {
   const [result, setResult] = useState<Place | null>(null);
   const [lastName, setLastName] = useState("");
 
-  const matches = useMemo(() => places.filter((p) =>
-    (kind === "都可以" || p.type === kind) && p.budget <= budget && p.travel <= travel && (!chair || p.chair)
-  ), [kind, budget, travel, chair]);
+  const transportPlaces = useMemo(
+    () => places.filter((place) => transport === "開車" || place.mrtFriendly),
+    [transport],
+  );
+
+  const matches = useMemo(() => transportPlaces.filter((p) =>
+    (kind === "都可以" || p.type === kind) && p.budget <= budget && getTravelMinutes(p, transport) <= travel && (!chair || p.chair)
+  ), [kind, budget, travel, chair, transportPlaces, transport]);
 
   function pickPlace() {
-    const pool = matches.length ? matches : places.filter((p) => p.travel <= Math.max(travel, 30));
+    const pool = matches.length ? matches : transportPlaces.filter((p) => getTravelMinutes(p, transport) <= Math.max(travel, 30));
     const fresh = pool.filter((p) => p.name !== lastName);
     const choices = fresh.length ? fresh : pool;
-    const picked = choices[Math.floor(Math.random() * choices.length)] || places[0];
+    const picked = choices[Math.floor(Math.random() * choices.length)] || transportPlaces[0] || places[0];
     setResult(picked);
     setLastName(picked.name);
     requestAnimationFrame(() => document.getElementById("result")?.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -169,7 +195,7 @@ export default function Home() {
     <main>
       <header className="topbar">
         <a className="brand" href="#top" aria-label="回到首頁"><span className="brand-mark">小</span><span>週末小隊</span></a>
-        <span className="location">⌖ 新北板橋</span>
+        <span className="location">⌖ {startingPoint}</span>
       </header>
 
       <section className="hero" id="top">
@@ -194,10 +220,17 @@ export default function Home() {
           <small className="hint">以全家三人的門票與餐費估算</small>
         </div>
 
+        <div className="field">
+          <label>今天怎麼出發？</label>
+          <div className="segmented transport-choice">{(["開車", "捷運"] as const).map((item) => <button key={item} className={transport === item ? "active" : ""} onClick={() => { setTransport(item); setResult(null); }}><span>{item === "開車" ? "🚗" : "🚇"}</span>{item}</button>)}</div>
+          <small className="hint">選捷運時，只推薦步行或短程轉乘方便抵達的地點</small>
+        </div>
+
         <div className="field range-field">
           <div className="label-row"><label htmlFor="travel">單程最遠交通時間</label><output>{travel} 分鐘</output></div>
           <input id="travel" type="range" min="15" max="75" step="5" value={travel} onChange={(e) => setTravel(Number(e.target.value))} style={{ "--range": `${((travel - 15) / 60) * 100}%` } as React.CSSProperties} />
           <div className="range-labels"><span>15 分</span><span>75 分</span></div>
+          <small className="hint">從{startingPoint}出發估算</small>
         </div>
 
         <div className="field switch-row">
@@ -218,12 +251,12 @@ export default function Home() {
       {result && <section className="result-wrap" id="result" aria-live="polite">
         <div className="result-label"><span>02</span><div><p>小隊長選好了！</p><h2>今天就去這裡吧</h2></div></div>
         <article className={`result-card ${result.tone}`}>
-          <div className="place-visual"><span>{result.emoji}</span><p>{result.area} · {result.type}</p></div>
+          <div className="place-visual"><span>{result.emoji}</span><p>{result.area} · {result.type} · {transport}</p></div>
           <div className="place-content">
             <div className="tags">{result.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
             <h3>{result.name}</h3>
-            <p className="why">{result.reason}</p>
-            <div className="stats"><div><small>單程交通</small><b>{result.travel} 分鐘</b></div><div><small>建議停留</small><b>{result.duration}</b></div><div><small>預估花費</small><b>{result.budget === 0 ? "免費" : `$${result.budget} 內`}</b></div></div>
+            <p className="why">{result.reason}以{startingPoint}出發，{transport}估計約 {getTravelMinutes(result, transport)} 分鐘。</p>
+            <div className="stats"><div><small>單程{transport}</small><b>{getTravelMinutes(result, transport)} 分鐘</b></div><div><small>建議停留</small><b>{result.duration}</b></div><div><small>預估花費</small><b>{result.budget === 0 ? "免費" : `$${result.budget} 內`}</b></div></div>
           </div>
         </article>
 
@@ -232,7 +265,7 @@ export default function Home() {
           <article className="mini-card"><span className="mini-icon">⌑</span><div><small>今天記得帶</small><ul>{result.supplies.map((item) => <li key={item}>✓ {item}</li>)}</ul></div></article>
         </div>
         <button className="retry" onClick={pickPlace}>↻ 換一個看看</button>
-        <p className="note">交通、預算與兒童椅為規劃估算；出發前請確認官方開放資訊、預約規則與天氣。</p>
+        <p className="note">交通、轉乘、預算與兒童椅為規劃估算；出發前請確認即時路況、官方開放資訊、預約規則與天氣。</p>
       </section>}
 
       <footer><span>週末不用完美，<b>一家人在一起就很好。</b></span><i>♡</i></footer>

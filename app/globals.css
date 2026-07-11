@@ -29,6 +29,7 @@ main { min-height:100vh; overflow:hidden; }
 .field { padding:0 0 28px; margin:0 0 28px; border-bottom:1px dashed #dddccf; }
 .field>label,.label-row label { display:block; margin-bottom:13px; font-size:14px; font-weight:800; }
 .segmented { display:grid;grid-template-columns:repeat(3,1fr);background:#f0eee6;padding:5px;border-radius:14px;gap:4px; }
+.segmented.transport-choice { grid-template-columns:repeat(2,1fr); }
 .segmented button { border:0;background:transparent;padding:12px 8px;border-radius:10px;font-weight:700;cursor:pointer; }
 .segmented button span { margin-right:6px; }.segmented button.active { background:white;color:var(--sage-dark);box-shadow:0 3px 12px rgba(54,65,56,.1); }
 .chips { display:flex;gap:9px;flex-wrap:wrap; }.chips button { padding:9px 15px;border:1px solid var(--line);border-radius:999px;background:white;font-size:13px;cursor:pointer; }.chips button.active { background:var(--sage-dark);border-color:var(--sage-dark);color:white; }
