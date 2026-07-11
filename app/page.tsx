@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 type Place = {
   name: string;
   area: string;
+  category: "景點" | "餐廳";
   type: "室內" | "戶外";
   budget: number;
   travel: number;
@@ -119,6 +120,39 @@ const placeSeeds: PlaceSeed[] = [
   ["龍潭大池", "龍潭", "戶外", 300, 75, true, "🌊", "湖畔步道、吊橋與大片景觀適合排成悠閒半日"],
 ];
 
+const restaurantSeeds: PlaceSeed[] = [
+  ["I'M 親子餐廳", "板橋", "室內", 1200, 15, true, "🍝", "遊戲空間、兒童餐具與高腳椅齊全，適合低齡孩子用餐"],
+  ["我們的家休閒小棧", "板橋", "室內", 1200, 10, true, "🏠", "鄰近江子翠站，有童書、積木與家家酒可讓孩子玩"],
+  ["一二三丸桐趣吧", "板橋", "室內", 1500, 20, true, "🎠", "親子遊戲區與餐飲結合，適合安排輕鬆家庭聚餐"],
+  ["50樓Café 自助餐廳", "板橋", "室內", 3200, 15, true, "🍽️", "高樓景觀與多樣自助餐點，大人小孩都容易找到喜歡的菜"],
+  ["望月樓", "板橋", "室內", 3600, 15, true, "🥟", "粵菜與港點適合多人分食，高樓景觀也能吸引孩子注意"],
+  ["悅・市集 新板希爾頓", "板橋", "室內", 3500, 15, true, "🧁", "寬敞自助餐空間與多元菜色，帶推車入座較從容"],
+  ["青雅中餐廳 新板希爾頓", "板橋", "室內", 3000, 15, true, "🥢", "中式合菜與舒適座位適合全家共享，也方便安排慶生"],
+  ["Mo-Mo-Paradise 板橋大遠百牧場", "板橋", "室內", 1800, 15, true, "🍲", "親子友善的壽喜燒選擇，訂位時可備註兒童椅"],
+  ["The Chips 美式餐廳 誠品板橋店", "板橋", "室內", 1500, 15, true, "🍔", "漢堡、義大利麵與早午餐選擇多，適合家庭分食"],
+  ["品鼎殿日式壽喜燒 板橋店", "板橋", "室內", 1600, 15, true, "🍲", "座位舒適、餐點選擇直覺，適合帶孩子一起吃鍋"],
+  ["猴子燒肉 Monkey Yakiniku 板橋店", "板橋", "室內", 1800, 15, true, "🥩", "可事先備註兒童座椅與餐具，家庭用餐準備較方便"],
+  ["食藝鍋 板橋文化店", "板橋", "室內", 1200, 10, true, "🥘", "嬰兒椅充足、個人鍋好分配，距離新埔出發也近"],
+  ["IKEA 新莊店瑞典餐廳", "新莊", "室內", 800, 25, true, "🧆", "有兒童餐、嬰兒食品、高腳椅、溫奶與親子設施"],
+  ["IKEA 新店店瑞典餐廳", "新店", "室內", 800, 35, true, "🧆", "供應兒童餐與副食品，並備有高腳椅和親子廁所"],
+  ["IKEA 桃園店瑞典餐廳", "桃園青埔", "室內", 800, 60, true, "🧆", "親子用餐區、兒童餐具與高腳椅完整，孩子也有遊戲空間"],
+  ["饗食天堂 板橋店", "板橋", "室內", 3200, 15, true, "🍣", "自助餐種類多，幼兒與大人都容易挑到合適餐點"],
+  ["開飯川食堂 板橋店", "板橋", "室內", 1800, 15, true, "🍚", "中式菜色適合共享，可彈性選擇不辣料理給孩子"],
+  ["涓豆腐 板橋環球店", "板橋", "室內", 1500, 15, true, "🍲", "豆腐煲與韓式小菜適合共享，車站商場內親子設施方便"],
+  ["真珠 台灣佳味 板橋店", "板橋", "室內", 1800, 15, true, "🍚", "熟悉的台灣家常菜適合全家分食，商場動線也方便推車"],
+  ["Garden Kitchen 台北萬豪", "中山區", "室內", 3600, 45, true, "🥗", "家庭友善自助餐與寬敞空間，適合較長時間的家庭聚餐"],
+  ["十二廚 台北喜來登", "中正區", "室內", 4200, 30, true, "🍤", "多國料理自助餐與開放式廚房，餐點選擇適合不同年齡"],
+  ["栢麗廳 台北晶華", "中山區", "室內", 4500, 35, true, "🍰", "空間寬敞、甜點與熟食豐富，適合特殊節日家庭聚餐"],
+  ["敘日全日餐廳 台北六福萬怡", "南港區", "室內", 3500, 50, true, "🍛", "車站共構、菜色多元，推車與大眾運輸動線都方便"],
+  ["MJ Kitchen 台北國泰萬怡", "中山區", "室內", 3600, 40, true, "🍽️", "開放式廚房與自助餐選擇充足，適合家庭共享"],
+  ["饗饗 微風信義店", "信義區", "室內", 4200, 40, true, "🍣", "景觀自助餐與多樣料理適合慶祝，捷運抵達也方便"],
+  ["旭集 和食集錦 信義店", "信義區", "室內", 3800, 40, true, "🍱", "日式自助餐選擇多，訂位可註明需要娃娃椅"],
+  ["豐FOOD 海陸百匯", "中山區", "室內", 3200, 45, true, "🦐", "菜色種類多、座位寬敞，適合多人與孩子一起聚餐"],
+  ["故宮晶華", "士林區", "室內", 3500, 55, true, "🏮", "中華料理與故宮行程可一起安排，家庭合菜方便共享"],
+  ["義饗食堂", "北投區", "室內", 2800, 55, true, "🍕", "義式自助料理與甜點選擇豐富，適合北投親子一日遊"],
+  ["漢來海港餐廳 桃園台茂店", "蘆竹", "室內", 3200, 50, true, "🦀", "商場內親子設施完整，自助餐可滿足不同年齡口味"],
+];
+
 const tones = ["peach", "sage", "blue", "green", "yellow", "aqua"];
 const startingPoint = "新埔捷運站";
 const mrtFriendlyPlaceNames = new Set([
@@ -131,9 +165,16 @@ const mrtFriendlyPlaceNames = new Set([
   "自來水博物館園區", "台北偶戲館", "郵政博物館", "士林官邸公園", "二二八和平公園",
   "大湖公園", "南興公園", "Xpark", "桃園市兒童美術館", "華興池生態埤塘公園",
   "橫山書法藝術館", "桃園機場第二航廈觀景台", "巧虎夢想樂園",
+  "I'M 親子餐廳", "我們的家休閒小棧", "50樓Café 自助餐廳", "望月樓",
+  "悅・市集 新板希爾頓", "青雅中餐廳 新板希爾頓", "Mo-Mo-Paradise 板橋大遠百牧場",
+  "The Chips 美式餐廳 誠品板橋店", "品鼎殿日式壽喜燒 板橋店", "猴子燒肉 Monkey Yakiniku 板橋店",
+  "食藝鍋 板橋文化店", "IKEA 新店店瑞典餐廳", "IKEA 桃園店瑞典餐廳", "饗食天堂 板橋店",
+  "開飯川食堂 板橋店", "涓豆腐 板橋環球店", "真珠 台灣佳味 板橋店", "Garden Kitchen 台北萬豪",
+  "十二廚 台北喜來登", "栢麗廳 台北晶華", "敘日全日餐廳 台北六福萬怡", "MJ Kitchen 台北國泰萬怡",
+  "饗饗 微風信義店", "旭集 和食集錦 信義店", "豐FOOD 海陸百匯", "義饗食堂",
 ]);
-const places: Place[] = placeSeeds.map(([name, area, type, budget, travel, chair, emoji, feature], index) => ({
-  name, area, type, budget, travel, chair, emoji, tone: tones[index % tones.length],
+const attractionPlaces: Place[] = placeSeeds.map(([name, area, type, budget, travel, chair, emoji, feature], index) => ({
+  name, area, category: "景點", type, budget, travel, chair, emoji, tone: tones[index % tones.length],
   mrtFriendly: mrtFriendlyPlaceNames.has(name),
   tags: [feature.split("，")[0].slice(0, 6), mrtFriendlyPlaceNames.has(name) ? "捷運方便" : type === "室內" ? "雨天可選" : "戶外散步"],
   reason: `${feature}。適合依寶寶當天精神彈性調整停留時間。`,
@@ -141,12 +182,30 @@ const places: Place[] = placeSeeds.map(([name, area, type, budget, travel, chair
   supplies: type === "室內" ? ["輕便推車", "薄外套", "寶寶水杯", "安撫小物"] : ["遮陽帽", "防蚊用品", "水與點心", "替換衣物"],
 }));
 
+const restaurantPlaces: Place[] = restaurantSeeds.map(([name, area, type, budget, travel, chair, emoji, feature], index) => ({
+  name, area, category: "餐廳", type, budget, travel, chair, emoji, tone: tones[(index + 2) % tones.length],
+  mrtFriendly: mrtFriendlyPlaceNames.has(name),
+  tags: ["親子用餐", mrtFriendlyPlaceNames.has(name) ? "捷運方便" : "兒童椅"],
+  reason: `${feature}。`,
+  duration: "1.5–2.5 小時",
+  supplies: ["寶寶圍兜", "濕紙巾", "水杯", "安撫小物"],
+}));
+
+const places = [...attractionPlaces, ...restaurantPlaces];
+
 const budgetOptions = [
-  { label: "免費為主", value: 0 },
-  { label: "$500 內", value: 500 },
-  { label: "$1,000 內", value: 1000 },
-  { label: "都可以", value: 3000 },
-];
+  { label: "$1,000 內", value: "under1000" },
+  { label: "$1,000–$3,000", value: "1000to3000" },
+  { label: "$3,000 以上", value: "over3000" },
+] as const;
+
+type BudgetBand = (typeof budgetOptions)[number]["value"];
+
+function matchesBudget(amount: number, budget: BudgetBand) {
+  if (budget === "under1000") return amount <= 1000;
+  if (budget === "1000to3000") return amount > 1000 && amount <= 3000;
+  return amount > 3000;
+}
 
 function getTravelMinutes(place: Place, transport: "開車" | "捷運") {
   return transport === "捷運"
@@ -156,8 +215,9 @@ function getTravelMinutes(place: Place, transport: "開車" | "捷運") {
 
 export default function Home() {
   const [kind, setKind] = useState<"都可以" | "室內" | "戶外">("都可以");
+  const [category, setCategory] = useState<"都可以" | "景點" | "餐廳">("都可以");
   const [transport, setTransport] = useState<"開車" | "捷運">("開車");
-  const [budget, setBudget] = useState(1000);
+  const [budget, setBudget] = useState<BudgetBand>("under1000");
   const [travel, setTravel] = useState(45);
   const [chair, setChair] = useState(false);
   const [napStart, setNapStart] = useState("13:00");
@@ -171,8 +231,8 @@ export default function Home() {
   );
 
   const matches = useMemo(() => transportPlaces.filter((p) =>
-    (kind === "都可以" || p.type === kind) && p.budget <= budget && getTravelMinutes(p, transport) <= travel && (!chair || p.chair)
-  ), [kind, budget, travel, chair, transportPlaces, transport]);
+    (category === "都可以" || p.category === category) && (kind === "都可以" || p.type === kind) && matchesBudget(p.budget, budget) && getTravelMinutes(p, transport) <= travel && (!chair || p.chair)
+  ), [category, kind, budget, travel, chair, transportPlaces, transport]);
 
   function pickPlace() {
     const pool = matches.length ? matches : transportPlaces.filter((p) => getTravelMinutes(p, transport) <= Math.max(travel, 30));
@@ -210,14 +270,19 @@ export default function Home() {
         <div className="section-heading"><span>01</span><div><p>今天想怎麼玩？</p><h2 id="planner-title">設定你們的週末條件</h2></div></div>
 
         <div className="field">
+          <label>這次想找什麼？</label>
+          <div className="segmented">{(["都可以", "景點", "餐廳"] as const).map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => { setCategory(item); setKind(item === "餐廳" ? "室內" : "都可以"); setResult(null); }}><span>{item === "都可以" ? "✨" : item === "景點" ? "🎡" : "🍽️"}</span>{item}</button>)}</div>
+        </div>
+
+        {category !== "餐廳" && <div className="field">
           <label>想待在室內還是戶外？</label>
           <div className="segmented">{(["都可以", "室內", "戶外"] as const).map((item) => <button key={item} className={kind === item ? "active" : ""} onClick={() => setKind(item)}><span>{item === "都可以" ? "✨" : item === "室內" ? "🏠" : "🌳"}</span>{item}</button>)}</div>
-        </div>
+        </div>}
 
         <div className="field">
           <label>今天的預算</label>
           <div className="chips">{budgetOptions.map((item) => <button key={item.value} className={budget === item.value ? "active" : ""} onClick={() => setBudget(item.value)}>{item.label}</button>)}</div>
-          <small className="hint">以全家三人的門票與餐費估算</small>
+          <small className="hint">以全家三人的門票或餐費總額估算</small>
         </div>
 
         <div className="field">
@@ -251,12 +316,12 @@ export default function Home() {
       {result && <section className="result-wrap" id="result" aria-live="polite">
         <div className="result-label"><span>02</span><div><p>小隊長選好了！</p><h2>今天就去這裡吧</h2></div></div>
         <article className={`result-card ${result.tone}`}>
-          <div className="place-visual"><span>{result.emoji}</span><p>{result.area} · {result.type} · {transport}</p></div>
+          <div className="place-visual"><span>{result.emoji}</span><p>{result.area} · {result.category} · {transport}</p></div>
           <div className="place-content">
             <div className="tags">{result.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
             <h3>{result.name}</h3>
             <p className="why">{result.reason}以{startingPoint}出發，{transport}估計約 {getTravelMinutes(result, transport)} 分鐘。</p>
-            <div className="stats"><div><small>單程{transport}</small><b>{getTravelMinutes(result, transport)} 分鐘</b></div><div><small>建議停留</small><b>{result.duration}</b></div><div><small>預估花費</small><b>{result.budget === 0 ? "免費" : `$${result.budget} 內`}</b></div></div>
+            <div className="stats"><div><small>單程{transport}</small><b>{getTravelMinutes(result, transport)} 分鐘</b></div><div><small>建議停留</small><b>{result.duration}</b></div><div><small>預估花費</small><b>{result.budget === 0 ? "免費" : `約 $${result.budget}`}</b></div></div>
           </div>
         </article>
 
@@ -265,7 +330,7 @@ export default function Home() {
           <article className="mini-card"><span className="mini-icon">⌑</span><div><small>今天記得帶</small><ul>{result.supplies.map((item) => <li key={item}>✓ {item}</li>)}</ul></div></article>
         </div>
         <button className="retry" onClick={pickPlace}>↻ 換一個看看</button>
-        <p className="note">交通、轉乘、預算與兒童椅為規劃估算；出發前請確認即時路況、官方開放資訊、預約規則與天氣。</p>
+        <p className="note">交通、轉乘、預算與兒童椅為規劃估算；餐廳營業、訂位及兒童設備可能調整，出發前請向店家確認。</p>
       </section>}
 
       <footer><span>週末不用完美，<b>一家人在一起就很好。</b></span><i>♡</i></footer>
