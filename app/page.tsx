@@ -196,6 +196,7 @@ const restaurantPlaces: Place[] = restaurantSeeds.map(([name, area, type, budget
 const places = [...attractionPlaces, ...restaurantPlaces];
 
 const budgetOptions = [
+  { label: "都可以", value: "all" },
   { label: "$1,000 內", value: "under1000" },
   { label: "$1,000–$3,000", value: "1000to3000" },
   { label: "$3,000 以上", value: "over3000" },
@@ -204,6 +205,7 @@ const budgetOptions = [
 type BudgetBand = (typeof budgetOptions)[number]["value"];
 
 function matchesBudget(amount: number, budget: BudgetBand) {
+  if (budget === "all") return true;
   if (budget === "under1000") return amount <= 1000;
   if (budget === "1000to3000") return amount > 1000 && amount <= 3000;
   return amount > 3000;
@@ -219,7 +221,7 @@ export default function Home() {
   const [kind, setKind] = useState<"都可以" | "室內" | "戶外">("都可以");
   const [category, setCategory] = useState<"都可以" | "景點" | "餐廳">("都可以");
   const [transport, setTransport] = useState<"開車" | "捷運">("開車");
-  const [budget, setBudget] = useState<BudgetBand>("under1000");
+  const [budget, setBudget] = useState<BudgetBand>("all");
   const [travel, setTravel] = useState(45);
   const [chair, setChair] = useState(false);
   const [napStart, setNapStart] = useState("13:00");
