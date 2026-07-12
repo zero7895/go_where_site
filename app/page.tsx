@@ -298,6 +298,13 @@ const metroRestaurantSeeds: MetroPlaceSeed[] = [
   ["樂野食 西門店", "萬華區", "室內", 1500, 25, true, "🎠", "附兒童遊戲區，親子與寵物家庭都方便", "西門站", 7, 20],
   ["貳樓餐廳 淡水站前店", "淡水", "室內", 1800, 60, true, "🥞", "捷運站對面、景觀座位與親子設施方便", "淡水站", 3, 58],
   ["享義食", "中和", "室內", 1500, 25, true, "🍝", "老宅遊戲區與親子餐點，鄰近四號公園", "永安市場站", 8, 22],
+  ["暖暖窩義式廚房", "板橋", "室內", 1400, 5, true, "🍝", "義大利麵、燉飯與披薩選擇多，是新埔站附近的親子餐廳", "新埔站", 5, 3],
+  ["陶板屋 和風創作料理 板橋捷運新埔店", "板橋", "室內", 1800, 5, true, "🍱", "套餐選擇清楚、座位舒適，適合家庭慶生與聚餐", "新埔站", 2, 3],
+  ["翁林林 Café", "板橋", "室內", 1200, 5, true, "🥞", "早午餐、義大利麵與燉飯選擇豐富，從三號出口步行可達", "新埔站", 3, 3],
+  ["小咪的店", "板橋", "室內", 1000, 5, true, "🍳", "現點現做早午餐與親子友善空間，適合輕鬆家庭用餐", "新埔站", 3, 3],
+  ["風日洋食", "板橋", "室內", 1400, 5, true, "🍛", "日式定食與蛋包飯具童趣，備有兒童椅與安全餐具", "新埔站", 6, 3],
+  ["沛果鮮食煮意", "板橋", "室內", 1200, 5, true, "🥗", "清爽鮮食與家庭餐點選擇多，適合帶孩子一起用餐", "新埔站", 8, 3],
+  ["Quack Kitchen 呱灶廚房", "板橋", "室內", 1200, 5, true, "🍔", "漢堡、熱狗堡與早午餐選擇多，鄰近新埔民生站", "新埔站", 10, 3],
 ];
 
 const tones = ["peach", "sage", "blue", "green", "yellow", "aqua"];
@@ -456,8 +463,6 @@ const places = [...rawPlaces.map((place) => {
   };
 }), ...metroRestaurantPlaces];
 
-const metroStations = ["全部車站", ...Array.from(new Set(places.flatMap((place) => place.station ? [place.station] : []))).sort((a, b) => a.localeCompare(b, "zh-Hant"))];
-
 const budgetOptions = [
   { label: "都可以", value: "all" },
   { label: "$1,000 內", value: "under1000" },
@@ -491,6 +496,15 @@ export default function Home() {
   const [result, setResult] = useState<Place | null>(null);
   const [lastName, setLastName] = useState("");
   const travelMax = transport === "捷運" ? 60 : 75;
+  const availableMetroStations = useMemo(() => [
+    "全部車站",
+    ...Array.from(new Set(places.flatMap((place) =>
+      place.station && place.mrtFriendly && (place.walkMinutes ?? 99) <= 10 && (place.mrtTravel ?? 99) <= 60 &&
+      (category === "都可以" || place.category === category) && (kind === "都可以" || place.type === kind)
+        ? [place.station]
+        : [],
+    ))).sort((a, b) => a.localeCompare(b, "zh-Hant")),
+  ], [category, kind]);
 
   const transportPlaces = useMemo(
     () => places.filter((place) => transport === "開車" || (place.mrtFriendly && place.station && (place.walkMinutes ?? 99) <= 10 && (place.mrtTravel ?? 99) <= 60)),
@@ -538,12 +552,12 @@ export default function Home() {
 
         <div className="field">
           <label>這次想找什麼？</label>
-          <div className="segmented">{(["都可以", "景點", "餐廳"] as const).map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => { setCategory(item); setKind(item === "餐廳" ? "室內" : "都可以"); setResult(null); }}><span>{item === "都可以" ? "✨" : item === "景點" ? "🎡" : "🍽️"}</span>{item}</button>)}</div>
+          <div className="segmented">{(["都可以", "景點", "餐廳"] as const).map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => { setCategory(item); setKind(item === "餐廳" ? "室內" : "都可以"); setStation("全部車站"); setResult(null); }}><span>{item === "都可以" ? "✨" : item === "景點" ? "🎡" : "🍽️"}</span>{item}</button>)}</div>
         </div>
 
         {category !== "餐廳" && <div className="field">
           <label>想待在室內還是戶外？</label>
-          <div className="segmented">{(["都可以", "室內", "戶外"] as const).map((item) => <button key={item} className={kind === item ? "active" : ""} onClick={() => setKind(item)}><span>{item === "都可以" ? "✨" : item === "室內" ? "🏠" : "🌳"}</span>{item}</button>)}</div>
+          <div className="segmented">{(["都可以", "室內", "戶外"] as const).map((item) => <button key={item} className={kind === item ? "active" : ""} onClick={() => { setKind(item); setStation("全部車站"); setResult(null); }}><span>{item === "都可以" ? "✨" : item === "室內" ? "🏠" : "🌳"}</span>{item}</button>)}</div>
         </div>}
 
         <div className="field">
@@ -561,7 +575,7 @@ export default function Home() {
         {transport === "捷運" && <div className="field">
           <label htmlFor="station">想去哪個捷運站？</label>
           <select id="station" className="station-select" value={station} onChange={(event) => { setStation(event.target.value); setResult(null); }}>
-            {metroStations.map((item) => <option key={item} value={item}>{item}</option>)}
+            {availableMetroStations.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
           <small className="hint">僅列出目前有景點或餐廳符合步行距離的車站</small>
         </div>}
