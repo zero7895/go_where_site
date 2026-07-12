@@ -321,7 +321,7 @@ const mrtFriendlyPlaceNames = new Set([
   "饗饗 微風信義店", "旭集 和食集錦 信義店", "豐FOOD 海陸百匯", "義饗食堂",
 ]);
 
-const metroAccessByName = new Map<string, [string, number, number]>([
+const metroAccessEntries: Array<[string, string, number, number]> = [
   ["板橋放送所", "府中站", 9, 10], ["林本源園邸", "府中站", 8, 10],
   ["新北市民廣場", "板橋站", 4, 5], ["板橋萬坪都會公園", "板橋站", 2, 5],
   ["新北市藝文中心", "新埔站", 10, 5], ["四號公園", "永安市場站", 2, 18],
@@ -388,7 +388,10 @@ const metroAccessByName = new Map<string, [string, number, number]>([
   ["小小樹食 大安本店", "大安站", 8, 33], ["COZZI Blu 逸薈軒", "A18 高鐵桃園站", 8, 58],
   ["NARA Thai Cuisine 桃園華泰店", "A18 高鐵桃園站", 5, 58], ["TGI FRIDAYS 華泰餐廳", "A18 高鐵桃園站", 5, 58],
   ["涓豆腐 桃園華泰店", "A18 高鐵桃園站", 5, 58],
-]);
+];
+const metroAccessByName = new Map<string, [string, number, number]>(
+  metroAccessEntries.map(([name, station, walkMinutes, travelMinutes]) => [name, [station, walkMinutes, travelMinutes]]),
+);
 const attractionPlaces: Place[] = placeSeeds.map(([name, area, type, budget, travel, chair, emoji, feature], index) => ({
   name, area, category: "景點", type, budget, travel, chair, emoji, tone: tones[index % tones.length],
   mrtFriendly: mrtFriendlyPlaceNames.has(name),
