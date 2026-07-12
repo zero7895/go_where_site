@@ -18,10 +18,14 @@ type Place = {
   supplies: string[];
   mrtFriendly: boolean;
   mapUrl?: string;
+  station?: string;
+  walkMinutes?: number;
+  mrtTravel?: number;
 };
 
 type PlaceSeed = [string, string, "室內" | "戶外", number, number, boolean, string, string];
 type ExtendedPlaceSeed = [...PlaceSeed, boolean];
+type MetroPlaceSeed = [...PlaceSeed, string, number, number];
 
 const placeSeeds: PlaceSeed[] = [
   // 新北市：新埔捷運站出發的近程選擇
@@ -261,6 +265,41 @@ const extraRestaurantSeeds: ExtendedPlaceSeed[] = [
   ["享鴨 桃園同德店", "桃園區", "室內", 2200, 60, true, "🦆", "烤鴨與中式合菜適合全家共享，餐點選擇直覺", false],
 ];
 
+const metroRestaurantSeeds: MetroPlaceSeed[] = [
+  ["涮乃葉 欣欣百貨店", "中山區", "室內", 1800, 35, true, "🍲", "蔬菜吧與個人鍋選擇多，孩子用餐容易安排", "中山站", 8, 30],
+  ["金色三麥 南西店", "中山區", "室內", 2200, 35, true, "🍗", "披薩、烤物與寬敞座位適合家庭共享", "中山站", 3, 30],
+  ["大戶屋 南西店", "中山區", "室內", 1200, 35, true, "🍱", "日式定食份量清楚，適合孩子與大人各自選餐", "中山站", 2, 30],
+  ["瓦城泰國料理 南西店", "中山區", "室內", 2200, 35, true, "🍛", "百貨內可選不辣合菜，親子設備方便", "中山站", 2, 30],
+  ["欣葉台菜 創始店", "中山區", "室內", 2800, 35, true, "🍚", "經典台菜適合長幼共享，家庭聚餐穩妥", "雙連站", 7, 32],
+  ["丸滿台灣味手路菜", "中山區", "室內", 2200, 35, true, "🥢", "家常台菜與合菜適合多人分食", "雙連站", 8, 32],
+  ["潮肉壽喜燒 民權店", "中山區", "室內", 1800, 40, true, "🍲", "壽喜燒與蔬菜選擇多，交通方便", "民權西路站", 5, 35],
+  ["天外天精緻麻辣火鍋 民權店", "中山區", "室內", 2200, 40, true, "🍲", "可選不辣鍋底與多樣熟食，適合家庭聚餐", "民權西路站", 4, 35],
+  ["欣葉小聚 林森店", "中山區", "室內", 2200, 40, true, "🍚", "台式家常菜與舒適座位適合全家共享", "中山國小站", 8, 38],
+  ["丰禾 台味風格料理 松江店", "中山區", "室內", 1800, 40, true, "🍚", "台式合菜口味熟悉，兒童也容易分食", "行天宮站", 5, 38],
+  ["心粵小廚", "中山區", "室內", 2200, 40, true, "🥟", "港點與粵菜選擇多，適合親子共享", "行天宮站", 6, 38],
+  ["養心茶樓 蔬食飲茶", "中山區", "室內", 2000, 35, true, "🥬", "蔬食港點造型豐富，孩子也能輕鬆嘗試", "松江南京站", 7, 33],
+  ["四平小館", "中山區", "室內", 1800, 35, true, "🥢", "北方麵點與合菜適合家庭分食", "松江南京站", 5, 33],
+  ["海底撈火鍋 慶城店", "松山區", "室內", 2600, 40, true, "🍲", "兒童用品與服務完整，也可選清淡鍋底", "南京復興站", 2, 37],
+  ["這一鍋 台北南京東殿", "松山區", "室內", 2200, 40, true, "🍲", "多種鍋底與寬敞座位方便家庭聚餐", "南京復興站", 6, 37],
+  ["TGI FRIDAYS 美麗華餐廳", "中山區", "室內", 2200, 50, true, "🍔", "美式餐點與商場親子設施適合全家", "劍南路站", 4, 45],
+  ["Mo-Mo-Paradise 美麗華牧場", "中山區", "室內", 1800, 50, true, "🍲", "壽喜燒與蔬菜選擇多，捷運出站即達", "劍南路站", 4, 45],
+  ["NARA Thai Cuisine 忠泰樂生活店", "中山區", "室內", 2200, 50, true, "🍛", "商場內泰式合菜可選不辣料理", "劍南路站", 2, 45],
+  ["瓦城泰國料理 美麗華店", "中山區", "室內", 2200, 50, true, "🍚", "百貨內合菜方便共享，親子設備完整", "劍南路站", 4, 45],
+  ["覺旅咖啡 陽光店", "內湖區", "室內", 1500, 50, true, "🥗", "空間寬敞、輕食與自選餐點適合家庭", "港墘站", 9, 48],
+  ["GB鮮釀餐廳 台北信義店", "信義區", "室內", 2400, 40, true, "🍕", "披薩與美式餐點適合共享，商場動線方便", "市政府站", 8, 35],
+  ["開飯川食堂 統一時代店", "信義區", "室內", 1800, 40, true, "🍚", "可挑選不辣川菜與白飯，適合全家共享", "市政府站", 2, 35],
+  ["NARA Thai Cuisine 統一時代店", "信義區", "室內", 2200, 40, true, "🍛", "捷運連通商場內可選不辣泰式料理", "市政府站", 2, 35],
+  ["饗泰多 松高店", "信義區", "室內", 2200, 40, true, "🍛", "泰式合菜與商場親子設施適合家庭聚餐", "市政府站", 7, 35],
+  ["瓦城泰國料理 微風信義店", "信義區", "室內", 2200, 40, true, "🍚", "商場內用餐舒適，合菜方便長幼共享", "市政府站", 5, 35],
+  ["鼎泰豐 台北101店", "信義區", "室內", 1800, 40, true, "🥟", "小籠包、炒飯與麵食容易讓孩子接受", "台北101／世貿站", 2, 38],
+  ["涓豆腐 台北時代店", "信義區", "室內", 1600, 40, true, "🍲", "豆腐煲與韓式小菜方便共享", "市政府站", 2, 35],
+  ["貳樓餐廳 微風南山店", "信義區", "室內", 1800, 40, true, "🥞", "早午餐選擇多，商場內推車與兒童椅方便", "台北101／世貿站", 4, 38],
+  ["春水堂 信義遠百店", "信義區", "室內", 1400, 40, true, "🧋", "麵食、點心與飲品選擇直覺，適合家庭休息", "市政府站", 9, 35],
+  ["樂野食 西門店", "萬華區", "室內", 1500, 25, true, "🎠", "附兒童遊戲區，親子與寵物家庭都方便", "西門站", 7, 20],
+  ["貳樓餐廳 淡水站前店", "淡水", "室內", 1800, 60, true, "🥞", "捷運站對面、景觀座位與親子設施方便", "淡水站", 3, 58],
+  ["享義食", "中和", "室內", 1500, 25, true, "🍝", "老宅遊戲區與親子餐點，鄰近四號公園", "永安市場站", 8, 22],
+];
+
 const tones = ["peach", "sage", "blue", "green", "yellow", "aqua"];
 const startingPoint = "新埔捷運站";
 const mrtFriendlyPlaceNames = new Set([
@@ -280,6 +319,75 @@ const mrtFriendlyPlaceNames = new Set([
   "開飯川食堂 板橋店", "涓豆腐 板橋環球店", "真珠 台灣佳味 板橋店", "Garden Kitchen 台北萬豪",
   "十二廚 台北喜來登", "栢麗廳 台北晶華", "敘日全日餐廳 台北六福萬怡", "MJ Kitchen 台北國泰萬怡",
   "饗饗 微風信義店", "旭集 和食集錦 信義店", "豐FOOD 海陸百匯", "義饗食堂",
+]);
+
+const metroAccessByName = new Map<string, [string, number, number]>([
+  ["板橋放送所", "府中站", 9, 10], ["林本源園邸", "府中站", 8, 10],
+  ["新北市民廣場", "板橋站", 4, 5], ["板橋萬坪都會公園", "板橋站", 2, 5],
+  ["新北市藝文中心", "新埔站", 10, 5], ["四號公園", "永安市場站", 2, 18],
+  ["國立臺灣圖書館", "永安市場站", 3, 18], ["碧潭風景區", "新店站", 2, 45],
+  ["新北大都會公園", "三重站", 5, 28], ["熊猴森樂園", "三重站", 7, 28],
+  ["臺北市立動物園", "動物園站", 2, 50], ["國立臺灣博物館本館", "台大醫院站", 5, 22],
+  ["國立臺灣博物館鐵道部園區", "北門站", 2, 20], ["國立臺灣博物館南門館", "中正紀念堂站", 6, 25],
+  ["國立歷史博物館", "小南門站", 10, 28], ["臺北植物園", "小南門站", 5, 28],
+  ["中正紀念堂園區", "中正紀念堂站", 2, 25], ["華山 1914 文化創意產業園區", "忠孝新生站", 4, 25],
+  ["松山文創園區", "市政府站", 9, 35], ["大安森林公園", "大安森林公園站", 1, 32],
+  ["榮星花園公園", "中山國中站", 8, 42], ["北投溫泉博物館", "新北投站", 6, 55],
+  ["臺北市立圖書館北投分館", "新北投站", 4, 55], ["臺北市立美術館", "圓山站", 9, 38],
+  ["臺北探索館", "市政府站", 3, 35], ["臺北市客家文化主題公園", "台電大樓站", 9, 28],
+  ["自來水博物館園區", "公館站", 6, 30], ["台北偶戲館", "市政府站", 9, 35],
+  ["郵政博物館", "中正紀念堂站", 5, 25], ["士林官邸公園", "士林站", 7, 45],
+  ["二二八和平公園", "台大醫院站", 1, 22], ["大湖公園", "大湖公園站", 1, 55],
+  ["南興公園", "南港站", 4, 45], ["Xpark", "A18 高鐵桃園站", 8, 58],
+  ["桃園市兒童美術館", "A19 桃園體育園區站", 8, 60], ["橫山書法藝術館", "A17 領航站", 6, 58],
+  ["桃園機場第二航廈觀景台", "A13 機場第二航廈站", 5, 60], ["巧虎夢想樂園", "A18 高鐵桃園站", 8, 58],
+  ["我們的家休閒小棧", "江子翠站", 5, 3], ["50樓Café 自助餐廳", "板橋站", 5, 5],
+  ["望月樓", "板橋站", 5, 5], ["悅・市集 新板希爾頓", "板橋站", 7, 5],
+  ["青雅中餐廳 新板希爾頓", "板橋站", 7, 5], ["Mo-Mo-Paradise 板橋大遠百牧場", "板橋站", 5, 5],
+  ["The Chips 美式餐廳 誠品板橋店", "板橋站", 7, 5], ["品鼎殿日式壽喜燒 板橋店", "府中站", 8, 10],
+  ["猴子燒肉 Monkey Yakiniku 板橋店", "府中站", 8, 10], ["食藝鍋 板橋文化店", "板橋站", 9, 5],
+  ["IKEA 新店店瑞典餐廳", "小碧潭站", 2, 40], ["饗食天堂 板橋店", "板橋站", 5, 5],
+  ["開飯川食堂 板橋店", "板橋站", 5, 5], ["涓豆腐 板橋環球店", "板橋站", 2, 5],
+  ["真珠 台灣佳味 板橋店", "板橋站", 5, 5], ["Garden Kitchen 台北萬豪", "劍南路站", 8, 45],
+  ["十二廚 台北喜來登", "善導寺站", 2, 20], ["栢麗廳 台北晶華", "中山站", 7, 30],
+  ["敘日全日餐廳 台北六福萬怡", "南港站", 2, 45], ["饗饗 微風信義店", "市政府站", 5, 35],
+  ["旭集 和食集錦 信義店", "市政府站", 9, 35], ["豐FOOD 海陸百匯", "劍南路站", 8, 45],
+  ["新店裕隆城", "大坪林站", 7, 38], ["斬龍山遺址文化公園", "土城站", 8, 20],
+  ["員和公園", "土城站", 4, 20], ["永和仁愛公園", "頂溪站", 10, 18],
+  ["新莊宏匯廣場", "A4 新莊副都心站", 3, 35], ["國家電影及視聽文化中心", "新莊站", 9, 30],
+  ["新北市眷村文化園區 空軍三重一村", "台北橋站", 9, 25], ["辰光橋天空猴探險樂園", "三重站", 8, 28],
+  ["淡水紅毛城", "淡水站", 10, 58], ["淡水漁人碼頭", "V26 淡水漁人碼頭站", 5, 60],
+  ["MITSUI OUTLET PARK 林口", "A9 林口站", 5, 55], ["貴子兒童公園", "A6 泰山貴和站", 5, 45],
+  ["臺北流行音樂中心文化館", "南港站", 9, 45], ["國立臺灣藝術教育館", "小南門站", 8, 28],
+  ["臺北市中山堂", "西門站", 5, 18], ["台北當代藝術館", "中山站", 7, 30],
+  ["袖珍博物館", "松江南京站", 8, 33], ["樹火紀念紙博物館", "松江南京站", 6, 33],
+  ["臺北市立圖書館總館", "大安森林公園站", 8, 32], ["大稻埕碼頭", "北門站", 10, 25],
+  ["迪化街", "北門站", 8, 25], ["剝皮寮歷史街區", "龍山寺站", 3, 17],
+  ["臺北記憶倉庫", "北門站", 2, 20], ["MAJI 集食行樂", "圓山站", 2, 38],
+  ["臺北典藏植物園", "圓山站", 7, 38], ["圓山花博公園", "圓山站", 2, 38],
+  ["內湖運動公園", "港墘站", 9, 50], ["碧湖公園", "文德站", 5, 52],
+  ["南港公園", "後山埤站", 9, 42], ["成美左岸河濱公園", "松山站", 8, 40],
+  ["彩虹河濱公園", "松山站", 9, 40], ["松山機場觀景台", "松山機場站", 2, 42],
+  ["寶藏巖國際藝術村", "公館站", 10, 30], ["貓空纜車", "動物園站", 2, 50],
+  ["新北投車站", "新北投站", 1, 55], ["七星公園", "新北投站", 1, 55],
+  ["地熱谷", "新北投站", 10, 55], ["芝山文化生態綠園", "芝山站", 9, 45],
+  ["鼎泰豐 板橋店", "板橋站", 5, 5], ["NARA Thai Cuisine 板橋大遠百店", "板橋站", 5, 5],
+  ["金色三麥 板橋大遠百店", "板橋站", 5, 5], ["瓦城泰國料理 板橋大遠百店", "板橋站", 5, 5],
+  ["涮乃葉 板橋遠百中山店", "府中站", 8, 10], ["大戶屋 板橋環球店", "板橋站", 2, 5],
+  ["丰禾 台味風格料理 板橋環球店", "板橋站", 2, 5], ["海底撈火鍋 板橋店", "板橋站", 7, 5],
+  ["乾杯燒肉居酒屋 板橋大遠百店", "板橋站", 5, 5], ["BabyWonderland 童話世界親子空間", "永安市場站", 10, 18],
+  ["象園咖啡 內湖店", "港墘站", 8, 50], ["貳樓餐廳 南港車站店", "南港站", 2, 45],
+  ["農人餐桌 親子餐廳", "西門站", 9, 18], ["TGI FRIDAYS 信義餐廳", "市政府站", 8, 35],
+  ["Lady nara 台北統一時代店", "市政府站", 2, 35], ["蘇杭餐廳 濟南店", "善導寺站", 8, 20],
+  ["欣葉台菜 南西店", "中山站", 2, 30], ["欣葉日本料理 館前店", "台北車站", 5, 18],
+  ["欣葉日本料理 健康店", "南京三民站", 9, 42], ["凱菲屋 台北君悅", "台北101／世貿站", 5, 38],
+  ["探索廚房 台北寒舍艾美", "市政府站", 5, 35], ["彩匯自助餐廳 台北美福", "劍南路站", 8, 45],
+  ["遠東Café 台北遠東香格里拉", "六張犁站", 10, 38], ["百宴自助餐廳 台北凱達", "龍山寺站", 2, 17],
+  ["饗聚廚房 台北花園大酒店", "小南門站", 5, 28], ["海霸王 長安甲天下", "松江南京站", 9, 33],
+  ["鼎泰豐 信義店", "東門站", 3, 28], ["果然匯 台北新光站前店", "台北車站", 5, 18],
+  ["小小樹食 大安本店", "大安站", 8, 33], ["COZZI Blu 逸薈軒", "A18 高鐵桃園站", 8, 58],
+  ["NARA Thai Cuisine 桃園華泰店", "A18 高鐵桃園站", 5, 58], ["TGI FRIDAYS 華泰餐廳", "A18 高鐵桃園站", 5, 58],
+  ["涓豆腐 桃園華泰店", "A18 高鐵桃園站", 5, 58],
 ]);
 const attractionPlaces: Place[] = placeSeeds.map(([name, area, type, budget, travel, chair, emoji, feature], index) => ({
   name, area, category: "景點", type, budget, travel, chair, emoji, tone: tones[index % tones.length],
@@ -319,7 +427,33 @@ const extraRestaurantPlaces: Place[] = extraRestaurantSeeds.map(([name, area, ty
   supplies: ["寶寶圍兜", "濕紙巾", "水杯", "安撫小物"],
 }));
 
-const places = [...attractionPlaces, ...restaurantPlaces, ...extraAttractionPlaces, ...extraRestaurantPlaces];
+const metroRestaurantPlaces: Place[] = metroRestaurantSeeds.map(([name, area, type, budget, travel, chair, emoji, feature, station, walkMinutes, mrtTravel], index) => ({
+  name, area, category: "餐廳", type, budget, travel, chair, emoji, tone: tones[(index + 3) % tones.length],
+  mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${area}`)}`,
+  mrtFriendly: true,
+  station,
+  walkMinutes,
+  mrtTravel,
+  tags: ["親子用餐", `${station}附近`],
+  reason: `${feature}。`,
+  duration: "1.5–2.5 小時",
+  supplies: ["寶寶圍兜", "濕紙巾", "水杯", "安撫小物"],
+}));
+
+const rawPlaces = [...attractionPlaces, ...restaurantPlaces, ...extraAttractionPlaces, ...extraRestaurantPlaces];
+const places = [...rawPlaces.map((place) => {
+  const access = metroAccessByName.get(place.name);
+  return {
+    ...place,
+    mrtFriendly: Boolean(access),
+    station: access?.[0],
+    walkMinutes: access?.[1],
+    mrtTravel: access?.[2],
+    tags: [place.tags[0], access ? `${access[0]}步行` : place.category === "餐廳" ? "開車方便" : place.type === "室內" ? "雨天可選" : "開車方便"],
+  };
+}), ...metroRestaurantPlaces];
+
+const metroStations = ["全部車站", ...Array.from(new Set(places.flatMap((place) => place.station ? [place.station] : []))).sort((a, b) => a.localeCompare(b, "zh-Hant"))];
 
 const budgetOptions = [
   { label: "都可以", value: "all" },
@@ -338,15 +472,14 @@ function matchesBudget(amount: number, budget: BudgetBand) {
 }
 
 function getTravelMinutes(place: Place, transport: "開車" | "捷運") {
-  return transport === "捷運"
-    ? Math.min(75, place.travel + (place.area === "板橋" ? 5 : 10))
-    : place.travel;
+  return transport === "捷運" ? place.mrtTravel ?? 99 : place.travel;
 }
 
 export default function Home() {
   const [kind, setKind] = useState<"都可以" | "室內" | "戶外">("都可以");
   const [category, setCategory] = useState<"都可以" | "景點" | "餐廳">("都可以");
   const [transport, setTransport] = useState<"開車" | "捷運">("開車");
+  const [station, setStation] = useState("全部車站");
   const [budget, setBudget] = useState<BudgetBand>("all");
   const [travel, setTravel] = useState(45);
   const [chair, setChair] = useState(false);
@@ -354,21 +487,22 @@ export default function Home() {
   const [napEnd, setNapEnd] = useState("15:00");
   const [result, setResult] = useState<Place | null>(null);
   const [lastName, setLastName] = useState("");
+  const travelMax = transport === "捷運" ? 60 : 75;
 
   const transportPlaces = useMemo(
-    () => places.filter((place) => transport === "開車" || place.mrtFriendly),
+    () => places.filter((place) => transport === "開車" || (place.mrtFriendly && place.station && (place.walkMinutes ?? 99) <= 10 && (place.mrtTravel ?? 99) <= 60)),
     [transport],
   );
 
   const matches = useMemo(() => transportPlaces.filter((p) =>
-    (category === "都可以" || p.category === category) && (kind === "都可以" || p.type === kind) && matchesBudget(p.budget, budget) && getTravelMinutes(p, transport) <= travel && (!chair || p.chair)
-  ), [category, kind, budget, travel, chair, transportPlaces, transport]);
+    (station === "全部車站" || p.station === station) && (category === "都可以" || p.category === category) && (kind === "都可以" || p.type === kind) && matchesBudget(p.budget, budget) && getTravelMinutes(p, transport) <= travel && (!chair || p.chair)
+  ), [station, category, kind, budget, travel, chair, transportPlaces, transport]);
 
   function pickPlace() {
-    const pool = matches.length ? matches : transportPlaces.filter((p) => getTravelMinutes(p, transport) <= Math.max(travel, 30));
-    const fresh = pool.filter((p) => p.name !== lastName);
-    const choices = fresh.length ? fresh : pool;
-    const picked = choices[Math.floor(Math.random() * choices.length)] || transportPlaces[0] || places[0];
+    if (!matches.length) return;
+    const fresh = matches.filter((p) => p.name !== lastName);
+    const choices = fresh.length ? fresh : matches;
+    const picked = choices[Math.floor(Math.random() * choices.length)];
     setResult(picked);
     setLastName(picked.name);
     requestAnimationFrame(() => document.getElementById("result")?.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -417,14 +551,22 @@ export default function Home() {
 
         <div className="field">
           <label>今天怎麼出發？</label>
-          <div className="segmented transport-choice">{(["開車", "捷運"] as const).map((item) => <button key={item} className={transport === item ? "active" : ""} onClick={() => { setTransport(item); setResult(null); }}><span>{item === "開車" ? "🚗" : "🚇"}</span>{item}</button>)}</div>
-          <small className="hint">選捷運時，只推薦步行或短程轉乘方便抵達的地點</small>
+          <div className="segmented transport-choice">{(["開車", "捷運"] as const).map((item) => <button key={item} className={transport === item ? "active" : ""} onClick={() => { setTransport(item); setStation("全部車站"); if (item === "捷運") setTravel(60); setResult(null); }}><span>{item === "開車" ? "🚗" : "🚇"}</span>{item}</button>)}</div>
+          <small className="hint">選捷運時，只推薦出站步行 10 分鐘內的地點</small>
         </div>
+
+        {transport === "捷運" && <div className="field">
+          <label htmlFor="station">想去哪個捷運站？</label>
+          <select id="station" className="station-select" value={station} onChange={(event) => { setStation(event.target.value); setResult(null); }}>
+            {metroStations.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+          <small className="hint">僅列出目前有景點或餐廳符合步行距離的車站</small>
+        </div>}
 
         <div className="field range-field">
           <div className="label-row"><label htmlFor="travel">單程最遠交通時間</label><output>{travel} 分鐘</output></div>
-          <input id="travel" type="range" min="15" max="75" step="5" value={travel} onChange={(e) => setTravel(Number(e.target.value))} style={{ "--range": `${((travel - 15) / 60) * 100}%` } as React.CSSProperties} />
-          <div className="range-labels"><span>15 分</span><span>75 分</span></div>
+          <input id="travel" type="range" min="15" max={travelMax} step="5" value={Math.min(travel, travelMax)} onChange={(e) => setTravel(Number(e.target.value))} style={{ "--range": `${((Math.min(travel, travelMax) - 15) / (travelMax - 15)) * 100}%` } as React.CSSProperties} />
+          <div className="range-labels"><span>15 分</span><span>{travelMax} 分</span></div>
           <small className="hint">從{startingPoint}出發估算</small>
         </div>
 
@@ -439,7 +581,7 @@ export default function Home() {
           <small className="hint">我們會避開午睡，安排舒服的出門時間</small>
         </div>
 
-        <button className="decide" onClick={pickPlace}><span>幫我決定！</span><i>→</i></button>
+        <button className="decide" onClick={pickPlace} disabled={!matches.length}><span>{matches.length ? "幫我決定！" : "沒有符合的選項"}</span><i>→</i></button>
         <p className="match-count">地點庫共 {places.length} 個・目前有 {matches.length} 個符合條件</p>
       </section>
 
@@ -450,7 +592,7 @@ export default function Home() {
           <div className="place-content">
             <div className="tags">{result.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
             <h3>{result.name}</h3>
-            <p className="why">{result.reason}以{startingPoint}出發，{transport}估計約 {getTravelMinutes(result, transport)} 分鐘。</p>
+            <p className="why">{result.reason}以{startingPoint}出發，{transport}估計約 {getTravelMinutes(result, transport)} 分鐘。{transport === "捷運" && result.station ? `從${result.station}步行約 ${result.walkMinutes} 分鐘。` : ""}</p>
             <div className="stats"><div><small>單程{transport}</small><b>{getTravelMinutes(result, transport)} 分鐘</b></div><div><small>建議停留</small><b>{result.duration}</b></div><div><small>預估花費</small><b>{result.budget === 0 ? "免費" : `約 $${result.budget}`}</b></div></div>
             {result.mapUrl && <a className="map-link" href={result.mapUrl} target="_blank" rel="noopener noreferrer" aria-label={`在 Google Maps 查看 ${result.name}`}>⌖ 在 Google Maps 查看</a>}
           </div>
