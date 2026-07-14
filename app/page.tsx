@@ -844,6 +844,7 @@ const metroAccessByName = new Map<string, [string, number, number]>(
 );
 const attractionPlaces: Place[] = placeSeeds.map(([name, area, type, budget, travel, chair, emoji, feature], index) => ({
   name, area, category: "景點", type, budget, travel, chair, emoji, tone: tones[index % tones.length],
+  mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${area}`)}`,
   mrtFriendly: mrtFriendlyPlaceNames.has(name),
   tags: [feature.split("，")[0].slice(0, 6), mrtFriendlyPlaceNames.has(name) ? "捷運方便" : type === "室內" ? "雨天可選" : "戶外散步"],
   reason: `${feature}。適合依寶寶當天精神彈性調整停留時間。`,
@@ -863,6 +864,7 @@ const restaurantPlaces: Place[] = restaurantSeeds.map(([name, area, type, budget
 
 const extraAttractionPlaces: Place[] = extraAttractionSeeds.map(([name, area, type, budget, travel, chair, emoji, feature, mrtFriendly], index) => ({
   name, area, category: "景點", type, budget, travel, chair, emoji, tone: tones[(index + 1) % tones.length],
+  mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${area}`)}`,
   mrtFriendly,
   tags: [feature.split("，")[0].slice(0, 6), mrtFriendly ? "捷運方便" : type === "室內" ? "雨天可選" : "開車方便"],
   reason: `${feature}。適合依寶寶當天精神彈性調整停留時間。`,
