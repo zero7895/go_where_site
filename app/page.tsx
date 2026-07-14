@@ -1107,14 +1107,16 @@ export default function Home() {
     (station === "全部車站" || p.station === station) && (category === "都可以" || p.category === category) && (kind === "都可以" || p.type === kind) && matchesBudget(p.budget, budget) && getTravelMinutes(p, transport) <= travel && (!chair || p.chair)
   ), [station, category, kind, budget, travel, chair, transportPlaces, transport]);
 
-  function pickPlace() {
+  function pickPlace(scrollToCard: boolean) {
     if (!matches.length) return;
     const fresh = matches.filter((p) => p.name !== lastName);
     const choices = fresh.length ? fresh : matches;
     const picked = choices[Math.floor(Math.random() * choices.length)];
     setResult(picked);
     setLastName(picked.name);
-    requestAnimationFrame(() => document.getElementById("result")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    if (scrollToCard) {
+      requestAnimationFrame(() => document.getElementById("recommendation-card")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
   }
 
   const leaveTime = useMemo(() => {
@@ -1190,13 +1192,13 @@ export default function Home() {
           <small className="hint">我們會避開午睡，安排舒服的出門時間</small>
         </div>
 
-        <button className="decide" onClick={pickPlace} disabled={!matches.length}><span>{matches.length ? "幫我決定！" : "沒有符合的選項"}</span><i>→</i></button>
+        <button className="decide" onClick={() => pickPlace(true)} disabled={!matches.length}><span>{matches.length ? "幫我決定！" : "沒有符合的選項"}</span><i>→</i></button>
         <p className="match-count">地點庫共 {places.length} 個・目前有 {matches.length} 個符合條件</p>
       </section>
 
       {result && <section className="result-wrap" id="result" aria-live="polite">
         <div className="result-label"><span>02</span><div><p>小隊長選好了！</p><h2>今天就去這裡吧</h2></div></div>
-        <article className={`result-card ${result.tone}`}>
+        <article className={`result-card ${result.tone}`} id="recommendation-card">
           <div className="place-visual"><span>{result.emoji}</span><p>{result.area} · {result.category} · {transport}</p></div>
           <div className="place-content">
             <div className="tags">{result.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
@@ -1206,12 +1208,12 @@ export default function Home() {
             {result.mapUrl && <a className="map-link" href={result.mapUrl} target="_blank" rel="noopener noreferrer" aria-label={`在 Google Maps 查看 ${result.name}`}>⌖ 在 Google Maps 查看</a>}
           </div>
         </article>
+        <button className="retry" onClick={() => pickPlace(false)}>↻ 換一個看看</button>
 
         <div className="plan-grid">
           <article className="mini-card time-card"><span className="mini-icon">◷</span><div><small>建議出門時間</small><h3>{leaveTime}</h3><p>寶寶 {napEnd} 睡醒後，留 25 分鐘整理再出發。</p></div></article>
           <article className="mini-card"><span className="mini-icon">⌑</span><div><small>今天記得帶</small><ul>{result.supplies.map((item) => <li key={item}>✓ {item}</li>)}</ul></div></article>
         </div>
-        <button className="retry" onClick={pickPlace}>↻ 換一個看看</button>
         <p className="note">交通、轉乘、預算與兒童椅為規劃估算；餐廳營業及兒童設備可能調整，親子館與室內樂園也可能採預約、分場入館或有防滑襪及身高限制，出發前請向場館確認。</p>
       </section>}
 
