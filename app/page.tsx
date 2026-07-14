@@ -869,6 +869,8 @@ const metroRestaurantSeeds: MetroPlaceSeed[] = [
 
 const tones = ["peach", "sage", "blue", "green", "yellow", "aqua"];
 const startingPoint = "新埔捷運站";
+// Update this value immediately before every production publish.
+const publishedAt = { label: "2026/07/14 21:57", iso: "2026-07-14T21:57:00+08:00" };
 const mrtFriendlyPlaceNames = new Set([
   "板橋放送所", "林本源園邸", "新北市民廣場", "板橋萬坪都會公園", "新北市藝文中心",
   "四號公園", "國立臺灣圖書館", "碧潭風景區", "新北大都會公園", "熊猴森樂園",
@@ -1217,7 +1219,7 @@ export default function Home() {
         <p className="note">交通、轉乘、預算與兒童椅為規劃估算；餐廳營業及兒童設備可能調整，親子館與室內樂園也可能採預約、分場入館或有防滑襪及身高限制，出發前請向場館確認。</p>
       </section>}
 
-      <footer><span>週末不用完美，<b>一家人在一起就很好。</b></span><i>♡</i></footer>
+      <footer><div className="footer-copy"><span>週末不用完美，<b>一家人在一起就很好。</b></span><time dateTime={publishedAt.iso}>最後更新發布：{publishedAt.label}</time></div><i>♡</i></footer>
     </main>
   );
 }
