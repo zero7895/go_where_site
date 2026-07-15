@@ -1128,6 +1128,14 @@ const places = [...rawPlaces.map((place) => {
   };
 }), ...metroRestaurantPlaces];
 
+const placeCounts = places.reduce(
+  (counts, place) => {
+    counts[place.category] += 1;
+    return counts;
+  },
+  { 景點: 0, 餐廳: 0 },
+);
+
 const budgetOptions = [
   { label: "都可以", value: "all" },
   { label: "$1,000 內", value: "under1000" },
@@ -1290,7 +1298,13 @@ export default function Home() {
         <p className="note">交通、轉乘、預算與兒童椅為規劃估算；餐廳營業及兒童設備可能調整，親子館與室內樂園也可能採預約、分場入館或有防滑襪及身高限制，出發前請向場館確認。</p>
       </section>}
 
-      <footer><div className="footer-copy"><span>週末不用完美，<b>一家人在一起就很好。</b></span><time dateTime={publishedAt.iso}>最後更新發布：{publishedAt.label}</time></div><i>♡</i></footer>
+      <footer>
+        <div className="footer-stats" aria-label={`目前資料庫共 ${placeCounts.景點} 個景點、${placeCounts.餐廳} 間餐廳`}>
+          <span><b>{placeCounts.景點}</b><small>個景點</small></span>
+          <span><b>{placeCounts.餐廳}</b><small>間餐廳</small></span>
+        </div>
+        <div className="footer-copy"><span>週末不用完美，<b>一家人在一起就很好。</b></span><time dateTime={publishedAt.iso}>最後更新發布：{publishedAt.label}</time></div><i>♡</i>
+      </footer>
     </main>
   );
 }
